@@ -1,0 +1,102 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Environments
+.env
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# macOS
+.DS_Store
+
+# PyCharm
+.idea/
+
+# Virtual environment
+venv/
+
+# Local development
+local_settings.py
+settings_local.py
+
+# Documentation
+docs/_build/
+
+# Sphinx
+docs/build/
+
+# PyPI
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Celery
+celerybeat-schedule.*
+celerybeat.pid
+
+# Media
+media/
+
+# Static files
+staticfiles/
+*.css
+*.min.js
+
+# Secrets
+secrets.yml
+config.yml
+*.key
+*.pem
+*.cert
