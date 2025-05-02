@@ -2,10 +2,17 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
+from dotenv import load_dotenv
+import os
 
-SECRET_KEY = "your-secret-key"  # Replace with a secure key
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("No SECRET_KEY set in environment variables")
+
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 60*24*7
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
