@@ -14,8 +14,7 @@ class User(Base):
     git_profile_link = Column(String)
     gmail_address = Column(String)
     role = Column(Enum(RoleEnum), nullable=False)
-
-    lastAccessed = Column(BigInteger, nullable=True, default=None)
-    sessionStart = Column(BigInteger, nullable=True, default=None)
-    passwordResetExpiry = Column(BigInteger, nullable=True, default=None)
+    last_accessed = Column(BigInteger, nullable=True, default=None)
+    session_start = Column(BigInteger, nullable=True, default=None)
+    password_reset_expiry = Column(BigInteger, nullable=True, default=None)
 
