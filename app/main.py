@@ -2,10 +2,12 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from contextlib import asynccontextmanager
 from .database import Base, engine, SessionLocal
-from .schemas import UserCreate, UserOut, Token, UserLogin
-from .crud import create_user, get_user
-from .auth import verify_password, create_access_token, verify_token
+from .schemas import UserCreate, UserOut
 from .models import User
+from .auth import create_user, verify_token, get_user, get_current_user
+from . import auth
+from typing import Annotated
+
 import os
 from dotenv import load_dotenv
 
@@ -37,6 +39,7 @@ async def lifespan(app: FastAPI):
         db.close()
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(auth.router)
 
 def get_db():
     db = SessionLocal()
@@ -48,21 +51,6 @@ def get_db():
 @app.get("/",response_model=str)
 def read_root():
     return "Hallo, übermensch!"
-
-@app.post("/register", response_model=UserOut)
-def register(user: UserCreate, db: Session = Depends(get_db)):
-    existing = get_user(db, user.username)
-    if existing:
-        raise HTTPException(status_code=400, detail="User already exists")
-    return create_user(db, user)
-
-@app.post("/login", response_model=Token)
-def login(user: UserLogin, db: Session = Depends(get_db)):
-    db_user = get_user(db, user.username)
-    if not db_user or not verify_password(user.password, db_user.password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    token = create_access_token(data={"sub": db_user.username})
-    return {"access_token": token, "token_type": "bearer"}
 
 @app.get("/me", response_model=UserOut)
 def read_users_me(token: str, db: Session = Depends(get_db)):
