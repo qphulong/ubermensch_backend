@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Enum
-from .database import Base
+from src.db.session import Base
 import enum
 
 class RoleEnum(str, enum.Enum):
@@ -14,4 +14,3 @@ class User(Base):
     git_profile_link = Column(String)
     gmail_address = Column(String)
     role = Column(Enum(RoleEnum), nullable=False)
-
