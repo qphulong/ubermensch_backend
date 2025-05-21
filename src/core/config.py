@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     ADMIN_EMAIL: str = ""
     ADMIN_GIT_LINK: str = ""
     ADMIN_GMAIL_APP_PASSWORD: str = ""
+    OTP_EXPIRED_TIME: int = 3
 
     class Config:
         env_file = ".env"

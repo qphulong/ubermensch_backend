@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
 from src.db.session import Base, engine, SessionLocal
-from src.schemas.user import UserCreate
+from src.schemas.schemas import UserCreate
 from src.crud.user import create_user
 from src.models.user import User
+from src.models.register_otps import RegisterOTPs
 from src.core.config import settings
 
 def init_db():

@@ -31,3 +31,8 @@ def read_root():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+#TODO: 
+# 1. cho config CORS list vao 1 file yaml rieng
+# 2. forget pass
+# 3. auto delete register_otps sau 1 khoang thoi gian
