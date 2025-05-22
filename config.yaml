@@ -7,3 +7,7 @@ cors:
     - "*"
   allow_headers:
     - "*"
+
+otp:
+  expired_time: 15
+  cleanup_interval: 5

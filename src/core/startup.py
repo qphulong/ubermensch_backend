@@ -34,9 +34,9 @@ def init_db():
         db.close()
 
 def setup_scheduler():
-    scheduler.add_job(cleanup_expired_otps, "interval", minutes=1)
+    scheduler.add_job(cleanup_expired_otps, "interval", minutes=settings.OTP_CLEANUP_INTERVAL)
     scheduler.start()
-    logger.info("Scheduler started for OTP cleanup every 5 minutes")
+    # logger.info("Scheduler started for OTP cleanup every 5 minutes")
 
 def shutdown_scheduler():
     scheduler.shutdown()

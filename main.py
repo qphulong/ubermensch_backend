@@ -8,7 +8,7 @@ import yaml
 app = FastAPI()
 
 # Load CORS configuration
-with open("config/cors.yaml", "r") as config_file:
+with open("config.yaml", "r") as config_file:
     cors_config = yaml.safe_load(config_file).get("cors", {})
 
 # Add CORS middleware
