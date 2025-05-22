@@ -4,6 +4,7 @@ from src.core.startup import init_db
 from src.api.endpoints.auth import router as auth_router
 from src.api.endpoints.users import router as users_router
 from fastapi.middleware.cors import CORSMiddleware
+import yaml
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -12,13 +13,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-# Add CORS middleware
+with open("config/cors.yaml", "r") as config_file:
+    cors_config = yaml.safe_load(config_file).get("cors", {})
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=cors_config.get("allow_origins", []),
+    allow_credentials=cors_config.get("allow_credentials", False),
+    allow_methods=cors_config.get("allow_methods", ["*"]),
+    allow_headers=cors_config.get("allow_headers", ["*"]),
 )
 
 app.include_router(auth_router, tags=["auth"])
@@ -31,8 +33,3 @@ def read_root():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
-
-#TODO: 
-# 1. cho config CORS list vao 1 file yaml rieng
-# 2. forget pass
-# 3. auto delete register_otps sau 1 khoang thoi gian
