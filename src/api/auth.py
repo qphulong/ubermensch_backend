@@ -4,7 +4,7 @@ from src.schemas.schemas import Token
 from src.crud.user import get_user
 from src.core.security import verify_password
 from src.services.auth import create_access_token
-from src.api.dependencies import get_db
+from src.db.session import get_db
 from src.services.otp import generate_otp
 from src.services.email import send_register_otp_email
 from src.crud.register_otps import create_otp
@@ -22,7 +22,7 @@ def login(form_data: UserLogin = Depends(), db: Session = Depends(get_db)):
     return {"access_token": token, "token_type": "bearer"}
 
 @router.post("/send-register-otp")
-def send_otp(email_schema: EmailSchema, db: Session = Depends(get_db)):
+def send_register_otp(email_schema: EmailSchema, db: Session = Depends(get_db)):
     email = email_schema.email
     if get_user_by_email(db, email):
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -33,5 +33,6 @@ def send_otp(email_schema: EmailSchema, db: Session = Depends(get_db)):
         return {"message": "OTP sent successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to send OTP")
+    
 
 

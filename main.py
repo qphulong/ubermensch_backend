@@ -1,20 +1,17 @@
 from fastapi import FastAPI
-from contextlib import asynccontextmanager
-from src.core.startup import init_db
-from src.api.endpoints.auth import router as auth_router
-from src.api.endpoints.users import router as users_router
+from src.core.startup import init_app
+from src.api.auth import router as auth_router
+from src.api.users import router as users_router
 from fastapi.middleware.cors import CORSMiddleware
 import yaml
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    init_db()
-    yield
+app = FastAPI()
 
-app = FastAPI(lifespan=lifespan)
-
+# Load CORS configuration
 with open("config/cors.yaml", "r") as config_file:
     cors_config = yaml.safe_load(config_file).get("cors", {})
+
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_config.get("allow_origins", []),
@@ -23,6 +20,10 @@ app.add_middleware(
     allow_headers=cors_config.get("allow_headers", ["*"]),
 )
 
+# Initialize app with database and scheduler
+init_app(app)
+
+# Include routers
 app.include_router(auth_router, tags=["auth"])
 app.include_router(users_router, tags=["users"])
 
@@ -33,3 +34,6 @@ def read_root():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+# 2. forget pass
+# 5. refactor lien quan toi import logging

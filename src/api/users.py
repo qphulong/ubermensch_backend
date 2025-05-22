@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.schemas.schemas import UserCreate, UserOut
 from src.crud.user import create_user
-from src.api.dependencies import get_db
+from src.db.session import get_db
 from src.crud.user import create_user, get_user_by_email
 from src.schemas.schemas import UserCreate, UserRegister
 from src.services.otp import verify_otp
