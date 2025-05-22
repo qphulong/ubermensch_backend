@@ -34,8 +34,3 @@ def read_root():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
-
-# 2. forget pass
-# 5. refactor lien quan toi import logging
-# 6. xem thu can refactor schemas/ va services/ ko
-# 7. chuyen config OTP_EXPIRED_TIME vao config/*.yaml
