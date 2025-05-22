@@ -37,3 +37,5 @@ if __name__ == "__main__":
 
 # 2. forget pass
 # 5. refactor lien quan toi import logging
+# 6. xem thu can refactor schemas/ va services/ ko
+# 7. chuyen config OTP_EXPIRED_TIME vao config/*.yaml
