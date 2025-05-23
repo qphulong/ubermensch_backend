@@ -24,12 +24,17 @@ cd postgres_container/
 docker-compose up -d
 ```
 
-### 3. Run the Application (Optional Development Mode)
+### 3. Run the Application (Optional - Development Mode)
 ```bash
 uvicorn main:app --reload
 ```
 
-### 4. Access the Database (Optional)
+### 4. Run the Application (Must - Deploy Mode)
+```bash
+nohup uvicorn main:app --host 0.0.0.0 --port 8000 --reload > backend.log 2>&1 &
+```
+
+### 5. Access the Database (Optional)
 ```bash
 docker exec -it postgres_container_db_1 psql -U user -d app_db
 ```

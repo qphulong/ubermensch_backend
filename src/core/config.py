@@ -35,4 +35,4 @@ class Settings(BaseSettings):
 
         return settings
 
-settings = Settings()
+settings = Settings.from_yaml("config.yaml")
