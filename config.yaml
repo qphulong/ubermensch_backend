@@ -1,0 +1,13 @@
+cors:
+  allow_origins:
+    - "http://localhost:5173"
+    - "https://ubermensch-frontend.onrender.com/"
+  allow_credentials: true
+  allow_methods:
+    - "*"
+  allow_headers:
+    - "*"
+
+otp:
+  expired_time: 15
+  cleanup_interval: 5

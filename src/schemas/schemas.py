@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from enum import Enum
 
+# TODO: refactor laij casi structure cuar directory schemas
 class RoleEnum(str, Enum):
     normal = "normal"
     manager = "manager"
@@ -11,6 +12,9 @@ class UserCreate(BaseModel):
     password: str
     git_profile_link: str
     gmail_address: str
+
+class UserRegister(UserCreate):
+    otp: str
 
 class UserLogin(BaseModel):
     username: str
@@ -37,3 +41,6 @@ class ChangePasswordRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class EmailSchema(BaseModel):
+    email: str
