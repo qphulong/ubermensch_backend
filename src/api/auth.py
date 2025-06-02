@@ -41,7 +41,7 @@ def register(user_register: UserRegister, db: Session = Depends(get_db)):
     if not verify_otp(db, user_register.gmail_address, user_register.otp):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
     
-    if user_service.user_exists(db, user_register.gmail_address):
+    if user_service.email_exists(db, user_register.gmail_address):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     if user_service.username_exists(db, user_register.username):

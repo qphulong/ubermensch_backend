@@ -20,21 +20,21 @@ def verify_token(token: str):
         return None
     
 class UserService:
-    async def get_user_by_email(self, db: Session, email: str):
+    def get_user_by_email(self, db: Session, email: str):
         return db.query(User).filter(User.gmail_address == email).first()
     
-    async def email_exists(self, db: Session, email: str):
-        user = await self.get_user_by_email(db, email)
+    def email_exists(self, db: Session, email: str):      
+        user = self.get_user_by_email(db, email)
         return user is not None
     
-    async def get_user_by_username(self, db: Session, username: str):
+    def get_user_by_username(self, db: Session, username: str):
         return db.query(User).filter(User.username == username).first()
     
-    async def username_exists(self, username: str, db: Session):
-        user = await self.get_user_by_username(db, username)
+    def username_exists(self, db: Session, username: str):
+        user = self.get_user_by_username(db, username)
         return user is not None
     
-    async def create_user(self, db: Session, user: UserCreate, role: str = "normal"):
+    def create_user(self, db: Session, user: UserCreate, role: str = "normal"):
         db_user = User(
             username=user.username,
             password=get_password_hash(user.password),
