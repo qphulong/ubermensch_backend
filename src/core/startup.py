@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from sqlalchemy.orm import Session
 from src.db.session import Base, engine, SessionLocal
 from src.schemas.schemas import UserCreate
-from src.crud.user import create_user
+from src.services.auth import UserService
 from src.models.user import User
 from src.models.register_otps import RegisterOTPs
 from src.core.config import settings
@@ -13,6 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 scheduler = AsyncIOScheduler()
+user_service = UserService()
 
 def init_db():
     Base.metadata.create_all(bind=engine)
@@ -26,7 +27,7 @@ def init_db():
                 git_profile_link=settings.ADMIN_GIT_LINK,
                 gmail_address=settings.ADMIN_EMAIL
             )
-            create_user(db, admin_user, role="admin")
+            user_service.create_user(db, admin_user, role="admin")
             logger.info(f"Admin user created with username '{settings.ADMIN_USERNAME}'")
     except Exception as e:
         logger.error(f"Error initializing database: {str(e)}")
