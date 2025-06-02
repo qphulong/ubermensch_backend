@@ -1,27 +1,58 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, status
+from fastapi.exceptions import HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from src.schemas.schemas import Token, UserCreate, UserOut, UserRegister
-from src.services.otp import verify_otp
-from src.services.auth import verify_token
-from src.core.security import verify_password
-from src.services.auth import create_access_token
+
+from src.schemas.schemas import Token, UserCreate, UserOut, UserRegister, EmailSchema, UserLogin
+from src.services.otp import verify_otp, generate_otp
+from src.core.security import verify_password, create_token, verify_token, decode_token
 from src.db.session import get_db
-from src.services.otp import generate_otp
 from src.services.email import send_register_otp_email
 from src.crud.register_otps import create_otp
-from src.schemas.schemas import EmailSchema, UserLogin
 from src.services.auth import UserService
 
 router = APIRouter()
 user_service = UserService()
 
-@router.post("/login", response_model=Token)
-def login(form_data: UserLogin = Depends(), db: Session = Depends(get_db)):
-    user = get_user(db, form_data.username)
-    if not user or not verify_password(form_data.password, user.password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    token = create_access_token(data={"sub": user.username})
-    return {"access_token": token, "token_type": "bearer"}
+@router.post("/login")
+def login(login_data: UserLogin, db: Session = Depends(get_db)):
+    username = login_data.username
+    password = login_data.password
+
+    user = user_service.get_user_by_username(db, username)
+    if user is not None:
+        password_verified = verify_password(password, user.password)
+        if password_verified:
+            access_token = create_token(
+                user_data={
+                    'username': user.username,
+                    'email': user.gmail_address,
+                    'password': user.password
+                }
+            )
+
+            refresh_token = create_token(
+                user_data={
+                    'username': user.username,
+                    'email': user.gmail_address,
+                    'password': user.password
+                },
+                refresh=True
+            )
+
+            return JSONResponse(
+                content={
+                    "message": "Login successful",
+                    "access_token": access_token,
+                    "refresh_token": refresh_token,
+                    "user": {
+                        "username": user.username,
+                        "email": user.gmail_address,
+                        "role": user.role
+                    }
+                }
+            )
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid username")
 
 @router.post("/send-register-otp")
 def send_register_otp(email_schema: EmailSchema, db: Session = Depends(get_db)):
