@@ -30,6 +30,10 @@ class UserService:
     async def get_user_by_username(self, db: Session, username: str):
         return db.query(User).filter(User.username == username).first()
     
+    async def username_exists(self, username: str, db: Session):
+        user = await self.get_user_by_username(db, username)
+        return user is not None
+    
     async def create_user(self, db: Session, user: UserCreate, role: str = "normal"):
         db_user = User(
             username=user.username,

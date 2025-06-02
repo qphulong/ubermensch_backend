@@ -40,8 +40,13 @@ def send_register_otp(email_schema: EmailSchema, db: Session = Depends(get_db)):
 def register(user_register: UserRegister, db: Session = Depends(get_db)):
     if not verify_otp(db, user_register.gmail_address, user_register.otp):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
-    if user_service.user_exists(user_register.gmail_address, db):
+    
+    if user_service.user_exists(db, user_register.gmail_address):
         raise HTTPException(status_code=400, detail="Email already registered")
+    
+    if user_service.username_exists(db, user_register.username):
+        raise HTTPException(status_code=400, detail="Username already taken")
+
     user_create = UserCreate(**user_register.model_dump(exclude={"otp"}))
     user_service.create_user(db, user_create)
     return {"message": "User registered successfully"}
@@ -54,7 +59,7 @@ def read_users_me(token: str, db: Session = Depends(get_db)):
     username = payload.get("sub")
     if username is None:
         raise HTTPException(status_code=401, detail="Invalid token")
-    user = get_user(db, username)
+    user = user_service.get_user_by_username(db, username)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user
