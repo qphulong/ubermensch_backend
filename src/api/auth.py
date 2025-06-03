@@ -11,6 +11,7 @@ from src.services.email import send_register_otp_email
 from src.crud.register_otps import create_otp
 from src.services.auth import UserService
 from src.core.config import settings
+from src.db.redis import add_token_to_blocklist
 import datetime
 
 router = APIRouter()
@@ -107,6 +108,15 @@ def get_new_access_token(
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="Refresh token expired"
+    )
+
+@router.get("/logout")
+def logout(token_details: dict = Depends(access_token_bearer)):
+    jti = token_details['jti']
+    add_token_to_blocklist(jti)
+    return JSONResponse(
+        content={"message": "Logged out successfully"},
+        status_code=status.HTTP_200_OK
     )
     
 @router.get("/me", response_model=UserOut)

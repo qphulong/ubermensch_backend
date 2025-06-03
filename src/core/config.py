@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
-    REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 60
     ADMIN_USERNAME: str = "admin"
     ADMIN_PASSWORD: str = "admin"
     ADMIN_EMAIL: str = ""
@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     ADMIN_GMAIL_APP_PASSWORD: str = ""
     OTP_EXPIRED_TIME: int = 3
     OTP_CLEANUP_INTERVAL: int =5
+    REDIS_HOST: str
+    REDIS_PORT: int = 6379
+    JTI_EXPIRATION: int = 60
 
     class Config:
         env_file = ".env"

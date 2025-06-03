@@ -7,6 +7,7 @@ from jose import JWTError, jwt
 import uuid
 from src.core.config import settings
 import logging
+from src.db.redis import is_token_blocked
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -54,6 +55,12 @@ class TokenBearer(HTTPBearer):
             )
         
         token_data = decode_token(token)
+        if is_token_blocked(token_data['jti']):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Token has been revoked"
+            )
+        
         self.verify_token_data(token_data)
 
         return token_data
