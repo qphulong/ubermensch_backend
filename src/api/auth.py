@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from src.schemas.schemas import Token, UserCreate, UserOut, UserRegister, EmailSchema, UserLogin
 from src.services.otp import verify_otp, generate_otp
-from src.core.security import verify_password, create_token, verify_token, decode_token
+from src.core.security import verify_password, create_token, AccessTokenBearer
 from src.db.session import get_db
 from src.services.email import send_register_otp_email
 from src.crud.register_otps import create_otp
@@ -13,6 +13,7 @@ from src.services.auth import UserService
 
 router = APIRouter()
 user_service = UserService()
+access_token_bearer = AccessTokenBearer()
 
 @router.post("/login")
 def login(login_data: UserLogin, db: Session = Depends(get_db)):
@@ -83,14 +84,7 @@ def register(user_register: UserRegister, db: Session = Depends(get_db)):
     return {"message": "User registered successfully"}
     
 @router.get("/me", response_model=UserOut)
-def read_users_me(token: str, db: Session = Depends(get_db)):
-    payload = verify_token(token)
-    if not payload:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    username = payload.get("sub")
-    if username is None:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    user = user_service.get_user_by_username(db, username)
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+def read_users_me(db: Session = Depends(get_db), user_details = Depends(access_token_bearer)):
+    user = user_details['user']
+    user = user_service.get_user_by_username(db, user['username'])
     return user
