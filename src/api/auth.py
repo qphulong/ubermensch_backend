@@ -5,15 +5,46 @@ from sqlalchemy.orm import Session
 
 from src.schemas.schemas import Token, UserCreate, UserOut, UserRegister, EmailSchema, UserLogin
 from src.services.otp import verify_otp, generate_otp
-from src.core.security import verify_password, create_token, AccessTokenBearer
+from src.core.security import verify_password, create_token, AccessTokenBearer, RefreshTokenBearer
 from src.db.session import get_db
 from src.services.email import send_register_otp_email
 from src.crud.register_otps import create_otp
 from src.services.auth import UserService
+from src.core.config import settings
+import datetime
 
 router = APIRouter()
 user_service = UserService()
 access_token_bearer = AccessTokenBearer()
+refresh_token_bearer = RefreshTokenBearer()
+
+@router.post("/send-register-otp")
+def send_register_otp(email_schema: EmailSchema, db: Session = Depends(get_db)):
+    email = email_schema.email
+    if user_service.email_exists(db, email):
+        raise HTTPException(status_code=400, detail="Email already registered")
+    otp = generate_otp()
+    create_otp(db, email, otp)
+    try:
+        send_register_otp_email(email, otp)
+        return {"message": "OTP sent successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to send OTP")
+
+@router.post("/register")
+def register(user_register: UserRegister, db: Session = Depends(get_db)):
+    if not verify_otp(db, user_register.gmail_address, user_register.otp):
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+    
+    if user_service.email_exists(db, user_register.gmail_address):
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    if user_service.username_exists(db, user_register.username):
+        raise HTTPException(status_code=400, detail="Username already taken")
+
+    user_create = UserCreate(**user_register.model_dump(exclude={"otp"}))
+    user_service.create_user(db, user_create)
+    return {"message": "User registered successfully"}
 
 @router.post("/login")
 def login(login_data: UserLogin, db: Session = Depends(get_db)):
@@ -55,33 +86,28 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)):
             )
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid username")
 
-@router.post("/send-register-otp")
-def send_register_otp(email_schema: EmailSchema, db: Session = Depends(get_db)):
-    email = email_schema.email
-    if user_service.email_exists(db, email):
-        raise HTTPException(status_code=400, detail="Email already registered")
-    otp = generate_otp()
-    create_otp(db, email, otp)
-    try:
-        send_register_otp_email(email, otp)
-        return {"message": "OTP sent successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Failed to send OTP")
+@router.get("/refresh-token")
+def get_new_access_token(
+    token_details: dict = Depends(refresh_token_bearer),
+):
+    expiry_timestamp = token_details['exp']
+    expiry_date = datetime.datetime.utcfromtimestamp(expiry_timestamp)
 
-@router.post("/register")
-def register(user_register: UserRegister, db: Session = Depends(get_db)):
-    if not verify_otp(db, user_register.gmail_address, user_register.otp):
-        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
-    
-    if user_service.email_exists(db, user_register.gmail_address):
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    if user_service.username_exists(db, user_register.username):
-        raise HTTPException(status_code=400, detail="Username already taken")
+    if expiry_date > datetime.datetime.utcnow():
+        new_access_token = create_token(
+            user_data=token_details['user']
+        )
+        return JSONResponse(
+            content={
+                "message": "New access token generated",
+                "access_token": new_access_token
+            }
+        )
 
-    user_create = UserCreate(**user_register.model_dump(exclude={"otp"}))
-    user_service.create_user(db, user_create)
-    return {"message": "User registered successfully"}
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Refresh token expired"
+    )
     
 @router.get("/me", response_model=UserOut)
 def read_users_me(db: Session = Depends(get_db), user_details = Depends(access_token_bearer)):
