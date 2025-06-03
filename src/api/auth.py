@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 from src.schemas.schemas import Token, UserCreate, UserOut, UserRegister, EmailSchema, UserLogin
 from src.services.otp import verify_otp, generate_otp
-from src.core.security import verify_password, create_token, AccessTokenBearer, RefreshTokenBearer
+from src.core.security import verify_password, create_token
+from src.dependencies.auth import AccessTokenBearer, RefreshTokenBearer, get_current_user, RoleChecker
 from src.db.session import get_db
 from src.services.email import send_register_otp_email
 from src.crud.register_otps import create_otp
@@ -18,6 +19,7 @@ router = APIRouter()
 user_service = UserService()
 access_token_bearer = AccessTokenBearer()
 refresh_token_bearer = RefreshTokenBearer()
+role_checker = RoleChecker(allowed_roles=["admin"])
 
 @router.post("/send-register-otp")
 def send_register_otp(email_schema: EmailSchema, db: Session = Depends(get_db)):
@@ -60,7 +62,8 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)):
                 user_data={
                     'username': user.username,
                     'email': user.gmail_address,
-                    'password': user.password
+                    'password': user.password,
+                    'role': user.role
                 }
             )
 
@@ -68,7 +71,8 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)):
                 user_data={
                     'username': user.username,
                     'email': user.gmail_address,
-                    'password': user.password
+                    'password': user.password,
+                    'role': user.role
                 },
                 refresh=True
             )
@@ -120,7 +124,5 @@ def logout(token_details: dict = Depends(access_token_bearer)):
     )
     
 @router.get("/me", response_model=UserOut)
-def read_users_me(db: Session = Depends(get_db), user_details = Depends(access_token_bearer)):
-    user = user_details['user']
-    user = user_service.get_user_by_username(db, user['username'])
+def read_users_me(user = Depends(get_current_user)):
     return user

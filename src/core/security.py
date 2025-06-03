@@ -1,13 +1,9 @@
-from fastapi import Request, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.exceptions import HTTPException
 from passlib.context import CryptContext
 from datetime import datetime, timezone, timedelta
 from jose import JWTError, jwt
 import uuid
 from src.core.config import settings
 import logging
-from src.db.redis import is_token_blocked
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -39,51 +35,3 @@ def verify_password(plain_password, hashed_password):
 
 def get_password_hash(password):
     return pwd_context.hash(password)
-
-class TokenBearer(HTTPBearer):
-    def __init__(self, auto_error: bool = True):
-        super().__init__(auto_error=auto_error)
-    
-    async def __call__(self, request: Request) -> HTTPAuthorizationCredentials | None:
-        creds = await super().__call__(request)
-
-        token = creds.credentials
-        if not self.valid(token):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Invalid authentication credentials"
-            )
-        
-        token_data = decode_token(token)
-        if is_token_blocked(token_data['jti']):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Token has been revoked"
-            )
-        
-        self.verify_token_data(token_data)
-
-        return token_data
-
-    def valid(self, token: str) -> bool:
-        token_data = decode_token(token)
-        return token_data is not None
-    
-    def verify_token_data(self, token_data: dict) -> None:
-        raise NotImplementedError("Subclasses must implement this method")
-    
-class AccessTokenBearer(TokenBearer):
-    def verify_token_data(self, token_data: dict) -> None:
-        if token_data and token_data['refresh']:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Please provide a valid access token"
-            )
-
-class RefreshTokenBearer(TokenBearer):
-    def verify_token_data(self, token_data: dict) -> None:
-        if token_data and not token_data['refresh']:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Please provide a valid refresh token"
-            )
