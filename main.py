@@ -11,9 +11,9 @@ app = FastAPI(
     title="Übermensch API",
     description="API for Übermensch project",
     version=version,
-    openapi_url="/api/v1/openapi.json",
-    docs_url="/api/v1/docs",
-    redoc_url="/api/v1/redoc",
+    openapi_url="/openapi.json",
+    docs_url="/docs",
+    redoc_url="/redoc",
     contact={
         "name": "Übermensch Team",
         "email": "selenajexin458@gmail.com"

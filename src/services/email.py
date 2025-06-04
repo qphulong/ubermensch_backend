@@ -5,7 +5,7 @@ from src.core.config import settings
 def send_register_otp_email(email: str, otp: str):
     msg = MIMEText(f"Your OTP for registration is: {otp}\nThis OTP will expire in {settings.OTP_EXPIRED_TIME} minutes.")
     msg['Subject'] = 'Registration OTP'
-    msg['From'] = settings.ADMIN_EMAIL
+    msg['From'] = f"{settings.ADMIN_NAME} <{settings.ADMIN_EMAIL}>"
     msg['To'] = email
 
     with smtplib.SMTP('smtp.gmail.com', 587) as server:

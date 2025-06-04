@@ -7,7 +7,7 @@ from src.models.user import User
 from src.models.register_otps import RegisterOTPs
 from src.core.config import settings
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from src.services.otps_cleanup import cleanup_expired_otps
+from src.services.otp import cleanup_expired_otps
 import logging
 
 logger = logging.getLogger(__name__)

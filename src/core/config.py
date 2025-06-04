@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 60
     ADMIN_USERNAME: str = "admin"
     ADMIN_PASSWORD: str = "admin"
+    ADMIN_NAME: str = "Übermensch"
     ADMIN_EMAIL: str = ""
     ADMIN_GIT_LINK: str = ""
     ADMIN_GMAIL_APP_PASSWORD: str = ""

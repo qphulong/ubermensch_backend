@@ -3,13 +3,12 @@ from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from src.schemas.schemas import Token, UserCreate, UserOut, UserRegister, EmailSchema, UserLogin
-from src.services.otp import verify_otp, generate_otp
+from src.schemas.schemas import UserCreate, UserOut, UserRegister, EmailSchema, UserLogin, PasswordResetSchema
+from src.services.otp import create_otp, verify_otp, generate_otp
 from src.core.security import verify_password, create_token
 from src.dependencies.auth import AccessTokenBearer, RefreshTokenBearer, get_current_user, RoleChecker
 from src.db.session import get_db
 from src.services.email import send_register_otp_email
-from src.crud.register_otps import create_otp
 from src.services.auth import UserService
 from src.core.config import settings
 from src.db.redis import add_token_to_blocklist
@@ -122,6 +121,15 @@ def logout(token_details: dict = Depends(access_token_bearer)):
         content={"message": "Logged out successfully"},
         status_code=status.HTTP_200_OK
     )
+
+@router.post("/reset-password")
+def reset_password(
+    email_schema: PasswordResetSchema,
+    new_password: str,
+    otp: str,
+    db: Session = Depends(get_db)
+):
+    pass
     
 @router.get("/me", response_model=UserOut)
 def read_users_me(user = Depends(get_current_user)):
