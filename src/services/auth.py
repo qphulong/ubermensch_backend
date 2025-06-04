@@ -30,3 +30,10 @@ class UserService:
         db.commit()
         db.refresh(db_user)
         return db_user
+    
+    def update_user(self, db: Session, user: User, user_data: dict):
+        for key, value in user_data.items():
+            setattr(user, key, value)
+        db.commit()
+        db.refresh(user)
+        return user

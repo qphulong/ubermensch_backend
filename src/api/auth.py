@@ -3,12 +3,12 @@ from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from src.schemas.schemas import UserCreate, UserOut, UserRegister, EmailSchema, UserLogin, PasswordResetSchema
+from src.schemas.schemas import UserCreate, UserOut, UserRegister, EmailSchema, UserLogin, PasswordResetSchema, PasswordResetRequestSchema
 from src.services.otp import create_otp, verify_otp, generate_otp
-from src.core.security import verify_password, create_token
+from src.core.security import verify_password, create_token, get_password_hash
 from src.dependencies.auth import AccessTokenBearer, RefreshTokenBearer, get_current_user, RoleChecker
 from src.db.session import get_db
-from src.services.email import send_register_otp_email
+from src.services.email import send_register_otp_email, send_password_reset_otp_email
 from src.services.auth import UserService
 from src.core.config import settings
 from src.db.redis import add_token_to_blocklist
@@ -88,7 +88,7 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)):
                     }
                 }
             )
-    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid username")
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid username or password")
 
 @router.get("/refresh-token")
 def get_new_access_token(
@@ -122,14 +122,47 @@ def logout(token_details: dict = Depends(access_token_bearer)):
         status_code=status.HTTP_200_OK
     )
 
+@router.post("/send-password-reset-otp")
+def send_password_reset_otp(email_schema: PasswordResetRequestSchema, db: Session = Depends(get_db)):
+    email = email_schema.email
+    if not user_service.email_exists(db, email):
+        raise HTTPException(status_code=400, detail="Email not registered")
+    otp = generate_otp()
+    create_otp(db, email, otp)
+    try:
+        send_password_reset_otp_email(email, otp)
+        return {"message": "OTP sent successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to send OTP")
+
 @router.post("/reset-password")
 def reset_password(
-    email_schema: PasswordResetSchema,
-    new_password: str,
-    otp: str,
+    password_reset_details: PasswordResetSchema,
     db: Session = Depends(get_db)
 ):
-    pass
+    user_email = password_reset_details.email
+    otp = password_reset_details.otp
+    new_password = password_reset_details.new_password
+    new_password_repeat = password_reset_details.new_password_repeat
+
+    if new_password != new_password_repeat:
+        raise HTTPException(status_code=400, detail="Passwords do not match")
+    
+    user = user_service.get_user_by_email(db, user_email)
+    if not user:
+        raise HTTPException(status_code=400, detail="Email not registered")
+    
+    if not verify_otp(db, user_email, otp):
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+    
+    new_password_hash = get_password_hash(new_password)
+    user_service.update_user(db, user, {"password": new_password_hash})
+
+    return JSONResponse(
+        content={"message": "Password reset successfully"},
+        status_code=status.HTTP_200_OK
+    )
+
     
 @router.get("/me", response_model=UserOut)
 def read_users_me(user = Depends(get_current_user)):
