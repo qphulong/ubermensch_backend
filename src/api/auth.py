@@ -114,9 +114,11 @@ def get_new_access_token(
     )
 
 @router.get("/logout")
-def logout(token_details: dict = Depends(access_token_bearer)):
-    jti = token_details['jti']
-    add_token_to_blocklist(jti)
+def logout(access_token_details: dict = Depends(access_token_bearer),
+           refresh_token_details: dict = Depends(refresh_token_bearer)):
+    add_token_to_blocklist(access_token_details['jti'])
+    add_token_to_blocklist(refresh_token_details['jti'])
+    
     return JSONResponse(
         content={"message": "Logged out successfully"},
         status_code=status.HTTP_200_OK
