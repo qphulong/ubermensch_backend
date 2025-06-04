@@ -2,22 +2,29 @@ from fastapi import FastAPI
 from src.core.startup import init_app
 from src.api.auth import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
+from src.middleware import register_middleware
 import yaml
 
-app = FastAPI()
+version = "0.1.0"
+
+app = FastAPI(
+    title="Übermensch API",
+    description="API for Übermensch project",
+    version=version,
+    openapi_url="/api/v1/openapi.json",
+    docs_url="/api/v1/docs",
+    redoc_url="/api/v1/redoc",
+    contact={
+        "name": "Übermensch Team",
+        "email": "selenajexin458@gmail.com"
+    }
+)
 
 # Load CORS configuration
 with open("config.yaml", "r") as config_file:
     cors_config = yaml.safe_load(config_file).get("cors", {})
 
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=cors_config.get("allow_origins", []),
-    allow_credentials=cors_config.get("allow_credentials", False),
-    allow_methods=cors_config.get("allow_methods", ["*"]),
-    allow_headers=cors_config.get("allow_headers", ["*"]),
-)
+register_middleware(app, cors_config=cors_config)
 
 # Initialize app with database and scheduler
 init_app(app)
