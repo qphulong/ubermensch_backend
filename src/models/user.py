@@ -13,4 +13,4 @@ class User(Base):
     password = Column(String, nullable=False)
     git_profile_link = Column(String)
     gmail_address = Column(String)
-    role = Column(Enum(RoleEnum), nullable=False)
+    role = Column(Enum(RoleEnum), nullable=False, default=RoleEnum.normal)

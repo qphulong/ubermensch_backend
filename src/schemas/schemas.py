@@ -29,9 +29,14 @@ class UserOut(BaseModel):
     class Config:
         from_attributes = True
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
 class EmailSchema(BaseModel):
     email: str
+
+class PasswordResetRequestSchema(BaseModel):
+    email: str
+
+class PasswordResetSchema(BaseModel):
+    email: str
+    new_password: str
+    new_password_repeat: str
+    otp: str
