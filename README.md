@@ -23,6 +23,10 @@ pip install -r requirements.txt
 cd postgres_container/
 docker-compose up -d
 ```
+To install pgvector in container (run once)
+```bash
+docker build -t custom-postgres-pgvector:15 -f Dockerfile.postgres .
+```
 
 ### 3. Run the Application (Optional - Development Mode)
 ```bash

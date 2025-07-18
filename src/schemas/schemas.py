@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from enum import Enum
+from typing import List
 
 # TODO: refactor laij casi structure cuar directory schemas
 class RoleEnum(str, Enum):
@@ -40,3 +41,35 @@ class PasswordResetSchema(BaseModel):
     new_password: str
     new_password_repeat: str
     otp: str
+
+# SEARCH ENGINE
+class PageRegisterInput(BaseModel):
+    id: str
+    author: str
+    local_url: str
+    text: str
+
+class PageRegisterResponse(BaseModel):
+    id: str
+    success: bool
+
+class SearchQuery(BaseModel):
+    query: str
+    top_k: int = Field(8, gt=0)
+
+class SearchResult(BaseModel):
+    id: str
+    author: str
+    local_url: str
+    distance: float
+
+class SearchResponse(BaseModel):
+    results: List[SearchResult]
+    
+class PageUnregister(BaseModel):
+    id: str
+class PageUnregisterResponse(BaseModel):
+    id: str
+    author: str
+    local_url: str
+    success: bool

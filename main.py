@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from src.core.startup import init_app
 from src.api.auth import router as auth_router
+from src.api.search_engine import router as search_engine_router
 from fastapi.middleware.cors import CORSMiddleware
 from src.middleware import register_middleware
 import yaml
@@ -31,6 +32,7 @@ init_app(app)
 
 # Include routers
 app.include_router(auth_router, tags=["auth"])
+app.include_router(search_engine_router)
 
 @app.get("/", response_model=str)
 def read_root():

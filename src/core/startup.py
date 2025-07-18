@@ -5,6 +5,7 @@ from src.schemas.schemas import UserCreate
 from src.services.auth import UserService
 from src.models.user import User
 from src.models.register_otps import RegisterOTPs
+from src.models.pages_index import PagesIndex
 from src.core.config import settings
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from src.services.otp import cleanup_expired_otps
@@ -37,7 +38,7 @@ def init_db():
 def setup_scheduler():
     scheduler.add_job(cleanup_expired_otps, "interval", minutes=settings.OTP_CLEANUP_INTERVAL)
     scheduler.start()
-    # logger.info("Scheduler started for OTP cleanup every 5 minutes")
+    logger.info("Scheduler started for OTP cleanup every 5 minutes")
 
 def shutdown_scheduler():
     scheduler.shutdown()
