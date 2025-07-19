@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     REDIS_HOST: str
     REDIS_PORT: int = 6379
     JTI_EXPIRATION: int = 60
+    OPENAI_API_KEY: str = ""
 
     class Config:
         env_file = ".env"
