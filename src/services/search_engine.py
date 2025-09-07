@@ -6,7 +6,7 @@ from sqlalchemy import text
 import numpy as np
 from src.core.config import settings
 from src.models.pages_index import PagesIndex
-from src.schemas.schemas import PageRegisterInput, SearchQuery, SearchResult
+from src.schemas.search_engine import PageRegisterInput, SearchQuery, SearchResult
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
