@@ -3,7 +3,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from src.schemas.schemas import UserCreate, UserOut, UserRegister, EmailSchema, UserLogin, PasswordResetSchema, PasswordResetRequestSchema
+from src.schemas.users import UserCreate, UserOut, UserRegister, EmailSchema, UserLogin, PasswordResetSchema, PasswordResetRequestSchema
 from src.services.otp import create_otp, verify_otp, generate_otp
 from src.core.security import verify_password, create_token, get_password_hash
 from src.dependencies.auth import AccessTokenBearer, RefreshTokenBearer, get_current_user, RoleChecker

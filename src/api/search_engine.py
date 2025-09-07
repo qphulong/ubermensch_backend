@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
 from src.db.session import get_db
-from src.schemas.schemas import (
+from src.schemas.search_engine import (
     PageRegisterInput,
     PageRegisterResponse,
     SearchQuery,
