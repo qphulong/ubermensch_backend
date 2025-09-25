@@ -1,6 +1,7 @@
 cors:
   allow_origins:
     - "http://localhost:5173"
+    - "http://localhost:3000"
     - "https://ubermensch-frontend.onrender.com/"
   allow_credentials: true
   allow_methods:
