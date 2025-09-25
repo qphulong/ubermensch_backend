@@ -42,3 +42,21 @@ nohup uvicorn main:app --host 0.0.0.0 --port 8000 --reload > backend.log 2>&1 &
 ```bash
 docker exec -it postgres_container_db_1 psql -U user -d app_db
 ```
+
+### 6. The .env file should look like
+```.env
+SECRET_KEY=
+DATABASE_URL=postgresql+psycopg2://user:password@localhost:5432/app_db
+
+ADMIN_USERNAME=
+ADMIN_PASSWORD=
+ADMIN_EMAIL=
+ADMIN_GMAIL_APP_PASSWORD=
+ADMIN_GIT_LINK=
+
+OPENAI_API_KEY=
+
+REDIS_HOST=localhost
+REDIS_PORT=6379
+```
+Contact the owner to get the key if you are local dev-ing
