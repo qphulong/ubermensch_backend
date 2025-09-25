@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from sqlalchemy.orm import Session
 from src.db.session import Base, engine, SessionLocal
-from src.schemas.schemas import UserCreate
+from src.schemas.users import UserCreate
 from src.services.auth import UserService
 from src.models.user import User
 from src.models.register_otps import RegisterOTPs

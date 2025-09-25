@@ -1,6 +1,6 @@
 from src.models.user import User
 from sqlalchemy.orm import Session
-from src.schemas.schemas import UserCreate
+from src.schemas.users import UserCreate
 from src.core.security import get_password_hash
     
 class UserService:
