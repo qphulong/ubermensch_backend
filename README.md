@@ -6,7 +6,7 @@
 - Docker (required for database)
 - Docker Compose (required for database)
 
-## Getting Started
+## Getting Started (http://xx.xx.xx.xx)
 
 ### 1. Set up Python Environment (Recommended)
 
@@ -58,5 +58,23 @@ OPENAI_API_KEY=
 
 REDIS_HOST=localhost
 REDIS_PORT=6379
+
+CLOUDFLARE_TUNNEL_UUID = 
 ```
 Contact the owner to get the key if you are local dev-ing
+
+## Deploy with https
+
+### 1. Start it
+# start uvicorn
+```bash
+nohup uvicorn main:app --host 0.0.0.0 --port 8000 > uvicorn.log 2>&1 & echo $! > uvicorn.pid
+
+nohup cloudflared tunnel --config ~/.cloudflared/config.yml run <CLOUDFLARE_TUNNEL_UUID> > cloudflared.log 2>&1 & echo $! > cloudflared.pid
+```
+
+### 2. Stop it
+```bash
+pkill -f "uvicorn main:app"
+pkill -f "cloudflared.*<CLOUDFLARE_TUNNEL_UUID>"
+```
